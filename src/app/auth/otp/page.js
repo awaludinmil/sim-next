@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 export default function OTPPage() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -68,8 +69,7 @@ export default function OTPPage() {
     }
   };
 
-  const verifyOTP = (otpCode) => {
-    const savedOTP = localStorage.getItem('currentOTP');
+  const verifyOTP = async (otpCode) => {
     const currentAttempts = attempts + 1;
 
     if (currentAttempts > maxAttempts) {
@@ -80,19 +80,45 @@ export default function OTPPage() {
     setAttempts(currentAttempts);
     localStorage.setItem('otpAttempts', currentAttempts.toString());
 
-    if (otpCode === savedOTP) {
-      alert('Verifikasi berhasil!');
-      localStorage.removeItem('currentOTP');
-      localStorage.removeItem('otpAttempts');
-      localStorage.removeItem('currentPhone');
-      router.push('/');
-    } else {
-      const remaining = maxAttempts - currentAttempts;
-      setError(
-        remaining > 0
-          ? `OTP salah. Sisa percobaan: ${remaining} kali`
-          : 'Anda telah melebihi batas percobaan. Silakan coba lagi nanti.'
-      );
+    try {
+      const resp = await axios.post('/api/auth/users/verify-otp', {
+        phone_number: phoneNumber,
+        otp: otpCode,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      });
+
+      const payload = resp.data || {};
+      const ok = payload?.success === true || payload?.status_code === 200;
+      if (ok) {
+        // simpan user_id jika diberikan untuk keperluan selanjutnya
+        const userId = payload?.data?.user_id;
+        if (userId) localStorage.setItem('currentUserId', userId);
+        // jaga agar currentPhone tetap ada untuk halaman set PIN
+        localStorage.removeItem('otpAttempts');
+        setError('');
+        router.push('/auth/pin');
+        return;
+      }
+
+      const message = payload?.message || 'OTP tidak valid.';
+      const remaining = Math.max(0, maxAttempts - currentAttempts);
+      setError(remaining > 0 ? `${message} Sisa percobaan: ${remaining} kali` : message);
+      setOtp(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+    } catch (err) {
+      console.error(err);
+      const message =
+        err?.response?.data?.message ||
+        (err?.message?.toLowerCase?.().includes('network error')
+          ? 'Gagal menghubungi server. Pastikan server berjalan lalu coba lagi.'
+          : err?.message) ||
+        'Terjadi kesalahan saat verifikasi OTP.';
+      const remaining = Math.max(0, maxAttempts - currentAttempts);
+      setError(remaining > 0 ? `${message} Sisa percobaan: ${remaining} kali` : message);
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     }

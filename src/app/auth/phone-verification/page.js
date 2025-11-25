@@ -2,37 +2,79 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 export default function PhoneVerificationPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = () => {
-    if (!phoneNumber || !agreed) {
+  const handleSubmit = async () => {
+    if (!phoneNumber || !agreed || loading) {
       alert('Mohon lengkapi nomor HP dan setujui persyaratan');
       return;
     }
 
-    const fullNumber = `+62${phoneNumber}`;
-    
-    // Cek apakah user sudah terdaftar
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
-    
-    if (users[fullNumber]) {
-      // User sudah terdaftar, arahkan ke login
-      localStorage.setItem('currentPhone', fullNumber);
-      router.push('/auth/login');
-    } else {
-      // User belum terdaftar, generate OTP 6 digit
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      localStorage.setItem('currentOTP', otp);
-      localStorage.setItem('otpAttempts', '0');
-      localStorage.setItem('currentPhone', fullNumber);
+    const national = phoneNumber.replace(/^0+/, '');
+    const localNumber = `0${national}`;
+    console.log(localNumber)
+    localStorage.setItem('currentPhone', localNumber);
+
+    try {
+      setLoading(true);
+      const resp = await axios.post(
+        '/api/auth/users/register',
+        { phone_number: localNumber },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        }
+      );
+
+      const payload = resp.data || {};
+      // Contoh respon backend:
+      // { success: true, status_code: 200, message: '...', data: { has_pin: false, requires_otp: true } }
+      const success = !!payload?.success;
+      const apiMessage = payload?.message;
+      const hasPin = !!payload?.data?.has_pin;
+      const requiresOtp = !!payload?.data?.requires_otp;
+
+      if (success) {
+        if (hasPin) {
+          router.push('/auth/pin');
+          return;
+        }
+        if (requiresOtp) {
+          // Inisialisasi counter OTP di client (untuk UI)
+          localStorage.setItem('otpAttempts', '0');
+          if (apiMessage) alert(apiMessage);
+          router.push('/auth/otp');
+          return;
+        }
+      }
+      // Jika tidak memenuhi kondisi di atas, tampilkan pesan dari server bila ada
+      if (apiMessage) alert(apiMessage);
+    } catch (err) {
+      console.error(err);
+      const message =
+        err?.response?.data?.message ||
+        (err?.message?.toLowerCase?.().includes('network error')
+          ? 'Gagal menghubungi server. Pastikan server berjalan lalu coba lagi.'
+          : err?.message) ||
+        'Terjadi kesalahan. Coba lagi.';
       
-      console.log('OTP untuk testing:', otp);
+      // If phone number is already registered, redirect to login
+      if (message.toLowerCase().includes('sudah terdaftar')) {
+        router.push('/auth/login');
+        return;
+      }
       
-      router.push('/auth/otp');
+      alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,14 +121,17 @@ export default function PhoneVerificationPage() {
               <span className="text-2xl">🇮🇩</span>
               <span className="text-gray-800 font-semibold text-lg">+62</span>
             </div>
-            <input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-              placeholder="Masukkan nomor handphone"
-              className="flex-1 pl-3 outline-none text-gray-900 placeholder-gray-400 text-base"
-              autoFocus
-            />
+            <div className="flex items-center gap-1 pl-3 flex-1">
+              <span className="text-gray-800 font-semibold text-lg">0</span>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                placeholder="81234567890"
+                className="flex-1 pl-1 outline-none text-gray-900 placeholder-gray-400 text-base"
+                autoFocus
+              />
+            </div>
           </div>
         </div>
 
@@ -113,17 +158,18 @@ export default function PhoneVerificationPage() {
           {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            disabled={!phoneNumber || !agreed}
+            disabled={!phoneNumber || !agreed || loading}
             className={`w-full py-4 rounded-xl font-semibold text-base transition-all ${
-              phoneNumber && agreed
+              phoneNumber && agreed && !loading
                 ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg active:scale-[0.98]'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
-            Lanjutkan
+            {loading ? 'Memproses...' : 'Lanjutkan'}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
