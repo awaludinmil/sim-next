@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 
 export default function PinPage() {
   const [pin, setPin] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -16,6 +18,8 @@ export default function PinPage() {
   }, [router]);
 
   const handleKey = (key) => {
+    if (loading) return;
+    
     if (key === 'del') {
       setPin((prev) => prev.slice(0, -1));
       return;
@@ -34,18 +38,59 @@ export default function PinPage() {
 
   useEffect(() => {
     const onKeyDown = (e) => {
+      if (loading) return;
+      
       if (/^\d$/.test(e.key)) handleKey(Number(e.key));
       if (e.key === 'Backspace' || e.key === 'Delete') handleKey('del');
       if (e.key === 'Enter' && pin.length === 6) onComplete(pin.join(''));
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [pin]);
+  }, [pin, loading]);
 
   const onComplete = async (value) => {
-    // TODO: sambungkan ke endpoint verifikasi PIN.
-    console.log('PIN entered:', value);
-    router.push('/');
+    setLoading(true);
+    setError('');
+    
+    try {
+      const phone = localStorage.getItem('currentPhone');
+      
+      const response = await fetch('/api/auth/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone_number: phone,
+          pin: value,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && response.status === 200) {
+        // Store tokens in localStorage
+        localStorage.setItem('accessToken', result.data.tokens.access_token);
+        localStorage.setItem('refreshToken', result.data.tokens.refresh_token);
+        localStorage.setItem('csrfToken', result.data.tokens.csrf_token);
+        
+        // Store user data
+        localStorage.setItem('userId', result.data.user.user_id);
+        localStorage.setItem('phoneNumber', result.data.user.phone_number);
+        
+        // Redirect to dashboard
+        router.push('/dashboard');
+      } else {
+        setError(result.message || 'PIN tidak valid');
+        setPin([]); // Clear PIN input
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Terjadi kesalahan saat login');
+      setPin([]); // Clear PIN input
+    } finally {
+      setLoading(false);
+    }
   };
   
   const keys = [
@@ -63,6 +108,7 @@ export default function PinPage() {
           onClick={() => router.back()}
           className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-lg"
           aria-label="Kembali"
+          disabled={loading}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
@@ -85,6 +131,13 @@ export default function PinPage() {
         {/* Title */}
         <h1 className="text-lg font-semibold text-gray-900 mb-4">Masukkan PIN Anda</h1>
 
+        {/* Error message */}
+        {error && (
+          <div className="text-red-500 text-sm mb-4 text-center">
+            {error}
+          </div>
+        )}
+
         {/* Dot indicator */}
         <div className="flex gap-3 mb-6">
           {Array.from({ length: 6 }).map((_, idx) => (
@@ -100,6 +153,7 @@ export default function PinPage() {
           type="button"
           onClick={() => alert('Fitur lupa PIN belum tersedia')}
           className="text-blue-600 font-medium mb-8"
+          disabled={loading}
         >
           Lupa PIN?
         </button>
@@ -114,8 +168,9 @@ export default function PinPage() {
                   <button
                     key={i}
                     onClick={() => handleKey('del')}
-                    className="aspect-square rounded-2xl bg-blue-700 text-white flex items-center justify-center text-2xl shadow-md hover:bg-blue-800 active:scale-95 transition"
+                    className="aspect-square rounded-2xl bg-blue-700 text-white flex items-center justify-center text-2xl shadow-md hover:bg-blue-800 active:scale-95 transition disabled:opacity-50"
                     aria-label="Hapus"
+                    disabled={loading}
                   >
                     <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 19l-6-7 6-7h12a2 2 0 012 2v10a2 2 0 01-2 2H6z" />
@@ -128,7 +183,8 @@ export default function PinPage() {
                 <button
                   key={i}
                   onClick={() => handleKey(Number(k))}
-                  className="aspect-square rounded-2xl bg-blue-700 text-white text-2xl font-semibold shadow-md hover:bg-blue-800 active:scale-95 transition"
+                  className="aspect-square rounded-2xl bg-blue-700 text-white text-2xl font-semibold shadow-md hover:bg-blue-800 active:scale-95 transition disabled:opacity-50"
+                  disabled={loading}
                 >
                   {k}
                 </button>
@@ -136,6 +192,13 @@ export default function PinPage() {
             })}
           </div>
         </div>
+
+        {/* Loading indicator */}
+        {loading && (
+          <div className="mt-4 text-blue-600">
+            Memverifikasi...
+          </div>
+        )}
       </div>
     </div>
   );
