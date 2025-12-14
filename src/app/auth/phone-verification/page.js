@@ -43,17 +43,13 @@ export default function PhoneVerificationPage() {
       const requiresOtp = !!payload?.data?.requires_otp;
 
       if (success) {
-        if (hasPin) {
-          router.push('/auth/pin');
-          return;
-        }
-        if (requiresOtp) {
-          // Inisialisasi counter OTP di client (untuk UI)
-          localStorage.setItem('otpAttempts', '0');
-          if (apiMessage) alert(apiMessage);
-          router.push('/auth/otp');
-          return;
-        }
+        // Selalu lanjut ke OTP. Simpan flag has_pin untuk ditentukan langkah berikutnya setelah OTP.
+        localStorage.setItem('registerHasPin', hasPin ? 'true' : 'false');
+        // Inisialisasi counter OTP di client (untuk UI)
+        localStorage.setItem('otpAttempts', '0');
+        if (apiMessage) alert(apiMessage);
+        router.push('/auth/otp');
+        return;
       }
       // Jika tidak memenuhi kondisi di atas, tampilkan pesan dari server bila ada
       if (apiMessage) alert(apiMessage);
@@ -66,9 +62,11 @@ export default function PhoneVerificationPage() {
           : err?.message) ||
         'Terjadi kesalahan. Coba lagi.';
       
-      // If phone number is already registered, redirect to login
+      // Jika nomor sudah terdaftar, lanjut ke OTP untuk login PIN
       if (message.toLowerCase().includes('sudah terdaftar')) {
-        router.push('/auth/login');
+        localStorage.setItem('registerHasPin', 'true');
+        localStorage.setItem('otpAttempts', '0');
+        router.push('/auth/otp');
         return;
       }
       

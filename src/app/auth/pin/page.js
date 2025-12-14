@@ -7,13 +7,37 @@ export default function PinPage() {
   const [pin, setPin] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [userId, setUserId] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    // Pastikan user datang dari alur yang benar
+    // Tentukan mode berdasarkan registerHasPin dari tahap phone verification
+    const fromOtpUserId = localStorage.getItem('currentUserId');
+    const registerHasPin = localStorage.getItem('registerHasPin');
     const phone = localStorage.getItem('currentPhone');
-    if (!phone) {
-      router.replace('/auth/phone-verification');
+
+    if (registerHasPin === 'true') {
+      // User sudah punya PIN -> login mode
+      if (!phone) {
+        router.replace('/auth/phone-verification');
+        return;
+      }
+      setPhoneNumber(phone);
+    } else if (registerHasPin === 'false') {
+      // User belum punya PIN -> set PIN mode (perlu user_id dari verify OTP)
+      if (fromOtpUserId) {
+        setUserId(fromOtpUserId);
+      } else {
+        router.replace('/auth/otp');
+      }
+    } else {
+      // Fallback: jika tidak ada flag, gunakan login mode default
+      if (!phone) {
+        router.replace('/auth/phone-verification');
+        return;
+      }
+      setPhoneNumber(phone);
     }
   }, [router]);
 
@@ -53,40 +77,79 @@ export default function PinPage() {
     setError('');
     
     try {
-      const phone = localStorage.getItem('currentPhone');
-      
-      const response = await fetch('/api/auth/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phone_number: phone,
-          pin: value,
-        }),
-      });
+      const registerHasPin = localStorage.getItem('registerHasPin');
+      if (registerHasPin === 'false' && userId) {
+        // Mode SET PIN setelah OTP terverifikasi
+        const resp = await fetch('/api/auth/users/set-pin', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            pin: value,
+          }),
+        });
 
-      const result = await response.json();
-
-      if (result.success && response.status === 200) {
-        // Store tokens in localStorage
-        localStorage.setItem('accessToken', result.data.tokens.access_token);
-        localStorage.setItem('refreshToken', result.data.tokens.refresh_token);
-        localStorage.setItem('csrfToken', result.data.tokens.csrf_token);
-        
-        // Store user data
-        localStorage.setItem('userId', result.data.user.user_id);
-        localStorage.setItem('phoneNumber', result.data.user.phone_number);
-        
-        // Redirect to dashboard
-        router.push('/dashboard');
+        const result = await resp.json();
+        if ((result?.success && resp.status === 200) || resp.status === 200) {
+          if (result?.data?.tokens) {
+            localStorage.setItem('accessToken', result.data.tokens.access_token);
+            localStorage.setItem('refreshToken', result.data.tokens.refresh_token);
+            localStorage.setItem('csrfToken', result.data.tokens.csrf_token);
+          }
+          localStorage.setItem('userId', userId);
+          const phone = localStorage.getItem('currentPhone');
+          if (phone) localStorage.setItem('phoneNumber', phone);
+          localStorage.removeItem('currentUserId');
+          localStorage.removeItem('registerHasPin');
+          localStorage.removeItem('otpAttempts');
+          router.push('/dashboard');
+        } else {
+          setError(result?.message || 'Gagal menyimpan PIN');
+          setPin([]);
+        }
       } else {
-        setError(result.message || 'PIN tidak valid');
-        setPin([]); // Clear PIN input
+        // Mode LOGIN dengan PIN
+        const response = await fetch('/api/auth/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phone_number: phoneNumber,
+            pin: value,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success && response.status === 200) {
+          localStorage.setItem('accessToken', result.data.tokens.access_token);
+          localStorage.setItem('refreshToken', result.data.tokens.refresh_token);
+          localStorage.setItem('csrfToken', result.data.tokens.csrf_token);
+          
+          if (result?.data?.user) {
+            localStorage.setItem('userId', result.data.user.user_id);
+            localStorage.setItem('phoneNumber', result.data.user.phone_number);
+          } else if (phoneNumber) {
+            localStorage.setItem('phoneNumber', phoneNumber);
+          }
+          // Bereskan flag sementara bila ada
+          localStorage.removeItem('currentUserId');
+          localStorage.removeItem('registerHasPin');
+          
+          router.push('/dashboard');
+        } else {
+          setError(result.message || 'PIN tidak valid');
+          setPin([]);
+        }
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Terjadi kesalahan saat login');
+      const registerHasPin = localStorage.getItem('registerHasPin');
+      const isSetPinMode = registerHasPin === 'false' && userId;
+      setError(isSetPinMode ? 'Terjadi kesalahan saat menyimpan PIN' : 'Terjadi kesalahan saat login');
       setPin([]); // Clear PIN input
     } finally {
       setLoading(false);
@@ -129,7 +192,9 @@ export default function PinPage() {
         </div>
 
         {/* Title */}
-        <h1 className="text-lg font-semibold text-gray-900 mb-4">Masukkan PIN Anda</h1>
+        <h1 className="text-lg font-semibold text-gray-900 mb-4">
+          {userId ? 'Buat PIN Anda' : 'Masukkan PIN Anda'}
+        </h1>
 
         {/* Error message */}
         {error && (
