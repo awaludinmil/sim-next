@@ -3,14 +3,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function OTPPage() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [attempts, setAttempts] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(300); // 5 menit
+  const [remainingTime, setRemainingTime] = useState(300);
   const [error, setError] = useState('');
   const [canResend, setCanResend] = useState(false);
+  const [loading, setLoading] = useState(false);
   const inputRefs = useRef([]);
   const router = useRouter();
   const maxAttempts = 5;
@@ -22,12 +24,10 @@ export default function OTPPage() {
       return;
     }
     setPhoneNumber(phone);
-
     const savedAttempts = parseInt(localStorage.getItem('otpAttempts') || '0');
     setAttempts(savedAttempts);
   }, [router]);
 
-  // Timer
   useEffect(() => {
     if (remainingTime > 0) {
       const timer = setTimeout(() => setRemainingTime(remainingTime - 1), 1000);
@@ -44,20 +44,17 @@ export default function OTPPage() {
   };
 
   const handleChange = (index, value) => {
-    // Hanya terima huruf dan angka
     if (value && !/^[A-Za-z0-9]$/.test(value)) return;
 
     const newOtp = [...otp];
-    newOtp[index] = value.toUpperCase(); // opsional: otomatis huruf besar
+    newOtp[index] = value.toUpperCase();
     setOtp(newOtp);
     setError('');
 
-    // Auto fokus ke input berikutnya
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto verify jika sudah lengkap
     if (newOtp.every(digit => digit !== '') && value) {
       setTimeout(() => verifyOTP(newOtp.join('')), 100);
     }
@@ -66,6 +63,21 @@ export default function OTPPage() {
   const handleKeyDown = (index, e) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').slice(0, 6).toUpperCase();
+    const newOtp = [...otp];
+    for (let i = 0; i < pastedData.length && i < 6; i++) {
+      if (/^[A-Za-z0-9]$/.test(pastedData[i])) {
+        newOtp[i] = pastedData[i];
+      }
+    }
+    setOtp(newOtp);
+    if (newOtp.every(digit => digit !== '')) {
+      setTimeout(() => verifyOTP(newOtp.join('')), 100);
     }
   };
 
@@ -79,6 +91,7 @@ export default function OTPPage() {
 
     setAttempts(currentAttempts);
     localStorage.setItem('otpAttempts', currentAttempts.toString());
+    setLoading(true);
 
     try {
       const resp = await axios.post('/api/auth/users/verify-otp', {
@@ -94,10 +107,8 @@ export default function OTPPage() {
       const payload = resp.data || {};
       const ok = payload?.success === true || payload?.status_code === 200;
       if (ok) {
-        // simpan user_id jika diberikan untuk keperluan selanjutnya
         const userId = payload?.data?.user_id;
         if (userId) localStorage.setItem('currentUserId', userId);
-        // jaga agar currentPhone tetap ada untuk halaman set PIN
         localStorage.removeItem('otpAttempts');
         setError('');
         router.push('/auth/pin');
@@ -114,36 +125,39 @@ export default function OTPPage() {
       const message =
         err?.response?.data?.message ||
         (err?.message?.toLowerCase?.().includes('network error')
-          ? 'Gagal menghubungi server. Pastikan server berjalan lalu coba lagi.'
+          ? 'Gagal menghubungi server.'
           : err?.message) ||
         'Terjadi kesalahan saat verifikasi OTP.';
       const remaining = Math.max(0, maxAttempts - currentAttempts);
       setError(remaining > 0 ? `${message} Sisa percobaan: ${remaining} kali` : message);
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleResend = () => {
     if (!canResend) return;
-
-    // Buat OTP baru 6 karakter alfanumerik
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let newOtp = '';
     for (let i = 0; i < 6; i++) {
       newOtp += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-
     localStorage.setItem('currentOTP', newOtp);
-    console.log('OTP baru untuk testing:', newOtp);
-
     setRemainingTime(300);
     setCanResend(false);
     setOtp(['', '', '', '', '', '']);
     setError('');
     inputRefs.current[0]?.focus();
-
-    alert('OTP baru telah dikirim!');
+    Swal.fire({
+      icon: 'success',
+      title: 'OTP Terkirim',
+      text: 'OTP baru telah dikirim ke nomor Anda!',
+      confirmButtonColor: '#3B82F6',
+      timer: 2000,
+      timerProgressBar: true,
+    });
   };
 
   const handleContinue = () => {
@@ -155,90 +169,172 @@ export default function OTPPage() {
     verifyOTP(otpCode);
   };
 
+  const isOtpComplete = otp.every(digit => digit !== '');
+  const canSubmit = isOtpComplete && attempts < maxAttempts && !loading;
+
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Header */}
-      <div className="p-4 flex items-center">
-        <button
-          onClick={() => router.back()}
-          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h2 className="flex-1 text-center text-lg font-semibold pr-10">
-          Verifikasi OTP
-        </h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50">
+      {/* Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col items-center px-6 pt-8">
-        <div className="mb-8">
-          <div className="w-28 h-28 bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl flex items-center justify-center shadow-xl border-4 border-white">
-            <div className="text-white text-center">
-              <div className="text-[10px] font-bold mb-1 tracking-wide">LALU LINTAS</div>
-              <div className="text-3xl">🛡️</div>
+      <div className="relative min-h-screen flex flex-col lg:flex-row">
+        {/* Left Side - Info (Desktop) */}
+        <div className="hidden lg:flex flex-1 flex-col justify-center px-16 xl:px-24 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white relative overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-20 right-20 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
+            <div className="absolute bottom-32 left-20 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
+          </div>
+
+          <div className="relative max-w-lg">
+            <div className="mb-8">
+              <div className="inline-flex items-center gap-4 p-4 bg-white/10 backdrop-blur-xl rounded-2xl">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                  <span className="text-3xl">🔐</span>
+                </div>
+                <div>
+                  <h2 className="font-bold text-2xl">Verifikasi OTP</h2>
+                  <p className="text-white/70">Langkah 2 dari 3</p>
+                </div>
+              </div>
+            </div>
+
+            <h1 className="text-4xl xl:text-5xl font-bold mb-6">Cek SMS Anda</h1>
+            <p className="text-xl text-white/80 mb-10 leading-relaxed">
+              Kami telah mengirimkan kode OTP 6 digit ke nomor <span className="font-semibold">{phoneNumber}</span>. Masukkan kode tersebut untuk melanjutkan.
+            </p>
+
+            <div className="p-6 bg-white/10 backdrop-blur-sm rounded-2xl">
+              <h4 className="font-semibold mb-3">Tips Keamanan:</h4>
+              <ul className="space-y-2 text-sm text-white/80">
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Jangan bagikan kode OTP kepada siapapun
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Kode OTP hanya berlaku selama 5 menit
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Maksimal 5 kali percobaan
+                </li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <h1 className="text-xl font-bold text-gray-900 mb-2">Masukkan Kode OTP</h1>
-
-        <p className="text-gray-600 text-center mb-8 text-sm max-w-sm">
-          Silahkan masukkan kode OTP yang kami kirimkan ke nomor hp{' '}
-          <span className="font-semibold">{phoneNumber}</span>
-        </p>
-
-        {/* OTP Input */}
-        <div className="flex gap-2 mb-6">
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              ref={(el) => (inputRefs.current[index] = el)}
-              type="text"
-              maxLength={1}
-              value={digit}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-12 h-14 text-center text-xl font-semibold border-2 border-blue-600 rounded-lg focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 uppercase"
-            />
-          ))}
-        </div>
-
-        {error && (
-          <div className="mb-4 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm text-center">
-            {error}
-          </div>
-        )}
-
-        <div className="text-center mb-auto">
-          <p className="text-sm text-gray-700">
-            Kirim Ulang <span className="font-medium">({attempts}/{maxAttempts})</span>{' '}
-            <span className="font-semibold text-blue-600">{formatTime(remainingTime)}</span>
-          </p>
-          {canResend && attempts < maxAttempts && (
+        {/* Right Side - OTP Form */}
+        <div className="flex-1 flex flex-col">
+          {/* Header */}
+          <div className="p-4 lg:p-6 flex items-center gap-4">
             <button
-              onClick={handleResend}
-              className="mt-2 text-blue-600 font-medium hover:underline"
+              onClick={() => router.back()}
+              className="w-12 h-12 rounded-xl border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
             >
-              Kirim Ulang OTP
+              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
-          )}
-        </div>
+            <h2 className="lg:hidden text-lg font-semibold text-gray-900">
+              Verifikasi OTP
+            </h2>
+          </div>
 
-        <div className="w-full max-w-md pb-6 px-4">
-          <button
-            onClick={handleContinue}
-            disabled={otp.some(digit => digit === '') || attempts >= maxAttempts}
-            className={`w-full py-4 rounded-xl font-semibold transition-all ${
-              otp.every(digit => digit !== '') && attempts < maxAttempts
-                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md active:scale-[0.98]'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Lanjut
-          </button>
+          {/* OTP Content */}
+          <div className="flex-1 flex items-center justify-center px-6 pb-12 lg:px-16">
+            <div className="w-full max-w-md text-center">
+              {/* Mobile Logo */}
+              <div className="lg:hidden mb-8">
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/30">
+                  <span className="text-white text-4xl">🔐</span>
+                </div>
+              </div>
+
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+                Masukkan Kode OTP
+              </h1>
+              <p className="text-gray-600 mb-8">
+                Kode dikirim ke <span className="font-semibold">{phoneNumber}</span>
+              </p>
+
+              {/* OTP Input */}
+              <div className="flex justify-center gap-2 lg:gap-3 mb-6" onPaste={handlePaste}>
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => (inputRefs.current[index] = el)}
+                    type="text"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className="w-12 h-14 lg:w-14 lg:h-16 text-center text-xl lg:text-2xl font-bold border-2 border-gray-200 rounded-xl bg-white text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 uppercase transition-all"
+                  />
+                ))}
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+                  {error}
+                </div>
+              )}
+
+              {/* Timer & Resend */}
+              <div className="mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm text-gray-600">
+                    Percobaan: <span className="font-medium">{attempts}/{maxAttempts}</span>
+                  </span>
+                  <span className="text-gray-400">•</span>
+                  <span className="font-semibold text-blue-600">{formatTime(remainingTime)}</span>
+                </div>
+                
+                {canResend && attempts < maxAttempts && (
+                  <button
+                    onClick={handleResend}
+                    className="block w-full mt-3 text-blue-600 font-medium hover:underline"
+                  >
+                    Kirim Ulang OTP
+                  </button>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <button
+                onClick={handleContinue}
+                disabled={!canSubmit}
+                className={`w-full py-4 rounded-xl font-semibold transition-all duration-300 ${
+                  canSubmit
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Memverifikasi...
+                  </span>
+                ) : (
+                  'Verifikasi'
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

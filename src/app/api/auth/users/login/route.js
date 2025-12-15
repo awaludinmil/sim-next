@@ -24,10 +24,34 @@ export async function POST(request) {
       data = { success: resp.ok, status_code: resp.status, message: text };
     }
 
-    return new Response(JSON.stringify(data), {
+    const responseHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    const setCookieHeaders = resp.headers.getSetCookie?.() || [];
+    
+    const csrfToken = resp.headers.get('x-csrf-token');
+    if (csrfToken && data.success) {
+      data.csrf_token = csrfToken;
+    }
+    
+    const response = new Response(JSON.stringify(data), {
       status: resp.status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: responseHeaders,
     });
+
+    setCookieHeaders.forEach((cookie) => {
+      response.headers.append('Set-Cookie', cookie);
+    });
+
+    if (setCookieHeaders.length === 0) {
+      const setCookie = resp.headers.get('set-cookie');
+      if (setCookie) {
+        response.headers.set('Set-Cookie', setCookie);
+      }
+    }
+
+    return response;
   } catch (error) {
     console.error('Proxy error /api/auth/users/login:', error);
     const msg =
