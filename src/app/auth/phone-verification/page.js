@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -10,7 +10,7 @@ export default function PhoneVerificationPage() {
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  
+
   useEffect(() => {
     checkActiveSession();
   }, []);
@@ -20,14 +20,14 @@ export default function PhoneVerificationPage() {
       // Import api dynamically
       const api = (await import('@/lib/api')).default;
       const response = await api.get('/api/auth/users/me');
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
           // If session is valid, redirect to dashboard
           // But show a small toast or just redirect
           const Swal = (await import('sweetalert2')).default;
-          
+
           Swal.fire({
             title: 'Sesi Masih Aktif',
             text: 'Mengalihkan ke dashboard...',
@@ -208,7 +208,7 @@ export default function PhoneVerificationPage() {
         <div className="flex-1 flex flex-col">
           {/* Mobile Header */}
           <div className="p-4 lg:p-6">
-            <button 
+            <button
               onClick={() => router.back()}
               className="w-12 h-12 rounded-xl border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
             >
@@ -282,11 +282,10 @@ export default function PhoneVerificationPage() {
               <button
                 onClick={handleSubmit}
                 disabled={!isFormValid}
-                className={`w-full py-4 rounded-xl font-semibold text-base transition-all duration-300 ${
-                  isFormValid
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-lg'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                }`}
+                className={`w-full py-4 rounded-xl font-semibold text-base transition-all duration-300 ${isFormValid
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-lg'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

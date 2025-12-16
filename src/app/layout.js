@@ -12,12 +12,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "SIM Online - Sistem Informasi Lalu Lintas",
-  description: "Aplikasi manajemen sistem lalu lintas dengan keamanan berlapis. Ajukan SIM baru, perpanjang, atau laporkan kehilangan dengan mudah.",
-  keywords: "SIM, Surat Izin Mengemudi, perpanjang SIM, buat SIM baru, lalu lintas",
-  authors: [{ name: "SIM Online Team" }],
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  // title: "SIM Online - Sistem Informasi Lalu Lintas",
+  // description: "Aplikasi manajemen sistem lalu lintas dengan keamanan berlapis. Ajukan SIM baru, perpanjang, atau laporkan kehilangan dengan mudah.",
+  // keywords: "SIM, Surat Izin Mengemudi, perpanjang SIM, buat SIM baru, lalu lintas",
+  // authors: [{ name: "SIM Online Team" }],
+  // // viewport removed from here
 };
+
+export function generateViewport() {
+  return {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  };
+}
 
 export default function RootLayout({ children }) {
   return (
