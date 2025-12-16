@@ -22,10 +22,17 @@ const MapWithNoSSR = dynamic(() => import('./MapComponent'), {
 });
 
 const simTypes = [
-  { type: 'a', title: 'SIM A', desc: 'Kendaraan roda 4 penumpang', price: 'Rp 120.000', popular: false },
-  { type: 'b1', title: 'SIM B1', desc: 'Kendaraan roda 4 barang', price: 'Rp 120.000', popular: false },
-  { type: 'c', title: 'SIM C', desc: 'Sepeda motor', price: 'Rp 100.000', popular: true },
-  { type: 'd', title: 'SIM D', desc: 'Kendaraan khusus penyandang disabilitas', price: 'Rp 50.000', popular: false },
+  { type: 'a', title: 'SIM A', desc: 'Kendaraan roda 4 penumpang pribadi', price: 'Rp 120.000', popular: false, category: 'Mobil' },
+  { type: 'a_umum', title: 'SIM A Umum', desc: 'Kendaraan roda 4 penumpang umum', price: 'Rp 120.000', popular: false, category: 'Mobil' },
+  { type: 'bi', title: 'SIM B1', desc: 'Kendaraan roda 4 barang (< 3.500 kg)', price: 'Rp 120.000', popular: false, category: 'Truk' },
+  { type: 'bi_umum', title: 'SIM B1 Umum', desc: 'Kendaraan roda 4 barang umum', price: 'Rp 120.000', popular: false, category: 'Truk' },
+  { type: 'bii', title: 'SIM B2', desc: 'Kendaraan roda 4 barang (> 3.500 kg)', price: 'Rp 120.000', popular: false, category: 'Truk' },
+  { type: 'bii_umum', title: 'SIM B2 Umum', desc: 'Kendaraan roda 4 barang besar umum', price: 'Rp 120.000', popular: false, category: 'Truk' },
+  { type: 'c', title: 'SIM C', desc: 'Sepeda motor (> 250 cc)', price: 'Rp 100.000', popular: true, category: 'Motor' },
+  { type: 'ci', title: 'SIM C1', desc: 'Sepeda motor (100-250 cc)', price: 'Rp 100.000', popular: false, category: 'Motor' },
+  { type: 'cii', title: 'SIM C2', desc: 'Sepeda motor (< 100 cc)', price: 'Rp 100.000', popular: false, category: 'Motor' },
+  { type: 'd', title: 'SIM D', desc: 'Kendaraan khusus penyandang disabilitas', price: 'Rp 50.000', popular: false, category: 'Khusus' },
+  { type: 'di', title: 'SIM D1', desc: 'Kendaraan motor penyandang disabilitas', price: 'Rp 50.000', popular: false, category: 'Khusus' },
 ];
 
 const requirements = [
@@ -230,43 +237,61 @@ export default function NewSimPage() {
 
                 <section className="card p-6">
                   <h2 className="font-bold text-lg text-slate-100 mb-4">Pilih Jenis SIM</h2>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {simTypes.map((sim) => (
-                      <div
-                        key={sim.type}
-                        onClick={() => setSelectedSimType(sim.type)}
-                        className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-lg
-                          ${selectedSimType === sim.type
-                            ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/30'
-                            : sim.popular
-                              ? 'border-blue-400/50 bg-blue-500/5'
-                              : 'border-slate-600 hover:border-blue-400'}`}
-                      >
-                        {sim.popular && (
-                          <span className="absolute -top-2 right-4 px-2 py-0.5 text-xs font-semibold bg-blue-600 text-white rounded-full">
-                            Populer
-                          </span>
-                        )}
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-                            {sim.type.toUpperCase()}
-                          </div>
-                          <span className="font-bold text-blue-400">{sim.price}</span>
-                        </div>
-                        <h4 className="font-semibold text-slate-100">{sim.title}</h4>
-                        <p className="text-sm text-slate-400">{sim.desc}</p>
-                        {selectedSimType === sim.type && (
-                          <div className="absolute top-2 left-2">
-                            <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                              </svg>
+                  
+                  {/* Group SIM by category */}
+                  {['Motor', 'Mobil', 'Truk', 'Khusus'].map((category) => {
+                    const categoryItems = simTypes.filter(sim => sim.category === category);
+                    if (categoryItems.length === 0) return null;
+                    
+                    return (
+                      <div key={category} className="mb-6 last:mb-0">
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                          {category === 'Motor' && '🏍️'}
+                          {category === 'Mobil' && '🚗'}
+                          {category === 'Truk' && '🚚'}
+                          {category === 'Khusus' && '♿'}
+                          {category}
+                        </h3>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {categoryItems.map((sim) => (
+                            <div
+                              key={sim.type}
+                              onClick={() => setSelectedSimType(sim.type)}
+                              className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-lg
+                                ${selectedSimType === sim.type
+                                  ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/30'
+                                  : sim.popular
+                                    ? 'border-blue-400/50 bg-blue-500/5'
+                                    : 'border-slate-600 hover:border-blue-400'}`}
+                            >
+                              {sim.popular && (
+                                <span className="absolute -top-2 right-4 px-2 py-0.5 text-xs font-semibold bg-blue-600 text-white rounded-full">
+                                  Populer
+                                </span>
+                              )}
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center text-white font-bold text-xs">
+                                  {sim.type.replace('_umum', '').replace('ii', '2').replace('i', '1').toUpperCase()}
+                                </div>
+                                <span className="font-bold text-blue-400 text-sm">{sim.price}</span>
+                              </div>
+                              <h4 className="font-semibold text-slate-100 text-sm">{sim.title}</h4>
+                              <p className="text-xs text-slate-400 line-clamp-2">{sim.desc}</p>
+                              {selectedSimType === sim.type && (
+                                <div className="absolute top-2 left-2">
+                                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        )}
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </section>
               </>
             )}
