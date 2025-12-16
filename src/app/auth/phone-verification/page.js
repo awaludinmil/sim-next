@@ -62,6 +62,12 @@ export default function PhoneVerificationPage() {
 
     try {
       setLoading(true);
+      
+      // Clear any old tokens before registration to prevent stale CSRF token errors
+      localStorage.removeItem('csrfToken');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      
       const resp = await axios.post(
         '/api/auth/users/register',
         { phone_number: localNumber },
