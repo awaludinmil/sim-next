@@ -6,12 +6,29 @@ export async function POST(request) {
   try {
     const cookies = request.headers.get('cookie') || '';
     
+    // Try to get refresh_token from body if provided
+    let bodyRefreshToken = null;
+    try {
+      const body = await request.json();
+      bodyRefreshToken = body.refresh_token;
+    } catch {
+      // Body might be empty, that's ok
+    }
+    
+    const headers = {
+      'Content-Type': 'application/json',
+      'Cookie': cookies,
+    };
+    
+    // If refresh token is provided in body, add it to Authorization header as fallback
+    if (bodyRefreshToken) {
+      headers['X-Refresh-Token'] = bodyRefreshToken;
+    }
+    
     const response = await fetch(`${BASE_URL}/api/auth/users/refresh`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cookie': cookies,
-      },
+      headers,
+      credentials: 'include',
     });
 
     const data = await response.json();
@@ -45,3 +62,4 @@ export async function POST(request) {
     );
   }
 }
+

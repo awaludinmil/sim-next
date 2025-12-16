@@ -40,13 +40,13 @@ const serviceCards = [
 ];
 
 const statusColors = {
-  diajukan: { bg: 'bg-blue-100', text: 'text-blue-700', dark: 'dark:bg-blue-900/30 dark:text-blue-400' },
-  diperiksa: { bg: 'bg-amber-100', text: 'text-amber-700', dark: 'dark:bg-amber-900/30 dark:text-amber-400' },
-  disetujui: { bg: 'bg-emerald-100', text: 'text-emerald-700', dark: 'dark:bg-emerald-900/30 dark:text-emerald-400' },
-  proses_ujian: { bg: 'bg-purple-100', text: 'text-purple-700', dark: 'dark:bg-purple-900/30 dark:text-purple-400' },
-  ujian_gagal: { bg: 'bg-red-100', text: 'text-red-700', dark: 'dark:bg-red-900/30 dark:text-red-400' },
-  selesai: { bg: 'bg-emerald-100', text: 'text-emerald-700', dark: 'dark:bg-emerald-900/30 dark:text-emerald-400' },
-  ditolak: { bg: 'bg-red-100', text: 'text-red-700', dark: 'dark:bg-red-900/30 dark:text-red-400' },
+  diajukan: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  diperiksa: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
+  disetujui: { bg: 'bg-emerald-500/20', text: 'text-emerald-400' },
+  proses_ujian: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
+  ujian_gagal: { bg: 'bg-red-500/20', text: 'text-red-400' },
+  selesai: { bg: 'bg-emerald-500/20', text: 'text-emerald-400' },
+  ditolak: { bg: 'bg-red-500/20', text: 'text-red-400' },
 };
 
 const statusLabels = {
@@ -126,7 +126,7 @@ export default function DashboardHome() {
 
       <main className="px-5 lg:px-8 py-6 lg:py-8 max-w-7xl mx-auto">
         <section className="hidden lg:block mb-8 fade-in">
-          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Ringkasan</h3>
+          <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Ringkasan</h3>
           <div className="grid grid-cols-4 gap-4">
             {quickStats.map((stat, index) => (
               <div
@@ -134,9 +134,9 @@ export default function DashboardHome() {
                 className={`card p-6 stagger-${index + 1}`}
                 style={{ animationFillMode: 'both' }}
               >
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{stat.label}</p>
+                <p className="text-sm text-slate-400 mb-1">{stat.label}</p>
                 <div className="flex items-end justify-between">
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                  <p className="text-3xl font-bold text-slate-100">{stat.value}</p>
                 </div>
               </div>
             ))}
@@ -144,7 +144,7 @@ export default function DashboardHome() {
         </section>
 
         <section className="mb-8">
-          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Layanan SIM</h3>
+          <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Layanan SIM</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
             {serviceCards.map((card, index) => (
               <Link
@@ -176,8 +176,8 @@ export default function DashboardHome() {
 
         <section className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pendaftaran Saya</h3>
-            <Link href="/dashboard/new" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Pendaftaran Saya</h3>
+            <Link href="/dashboard/new" className="text-sm text-blue-400 hover:text-blue-300 font-medium">
               + Buat Baru
             </Link>
           </div>
@@ -185,7 +185,7 @@ export default function DashboardHome() {
           <div className="card overflow-hidden">
             {loading ? (
               <div className="p-8 text-center">
-                <div className="flex items-center justify-center gap-2 text-gray-500">
+                <div className="flex items-center justify-center gap-2 text-slate-400">
                   <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -195,11 +195,11 @@ export default function DashboardHome() {
               </div>
             ) : pendaftaran.length === 0 ? (
               <div className="p-8 text-center">
-                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                <div className="w-16 h-16 mx-auto bg-slate-700 rounded-2xl flex items-center justify-center mb-4">
                   <span className="text-3xl">📋</span>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Belum Ada Pendaftaran</h4>
-                <p className="text-gray-500 text-sm mb-4">Mulai daftar SIM baru dengan klik tombol di bawah</p>
+                <h4 className="font-semibold text-slate-100 mb-2">Belum Ada Pendaftaran</h4>
+                <p className="text-slate-400 text-sm mb-4">Mulai daftar SIM baru dengan klik tombol di bawah</p>
                 <Link
                   href="/dashboard/new"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -209,7 +209,7 @@ export default function DashboardHome() {
               </div>
             ) : (
               <>
-                <div className="hidden lg:grid grid-cols-5 gap-4 px-6 py-4 bg-gray-50 dark:bg-gray-800/50 text-sm font-semibold text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                <div className="hidden lg:grid grid-cols-5 gap-4 px-6 py-4 bg-slate-700/50 text-sm font-semibold text-slate-400 border-b border-slate-600">
                   <span>Kode Pendaftaran</span>
                   <span>Jenis SIM</span>
                   <span>Tanggal Ujian</span>
@@ -220,23 +220,23 @@ export default function DashboardHome() {
                 {pendaftaran.map((item) => (
                   <div
                     key={item.pendaftaran_id}
-                    className="flex flex-col lg:grid lg:grid-cols-5 gap-2 lg:gap-4 px-6 py-4 border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
+                    className="flex flex-col lg:grid lg:grid-cols-5 gap-2 lg:gap-4 px-6 py-4 border-b border-slate-700 last:border-0 hover:bg-slate-700/50 transition-colors"
                   >
                     <div>
-                      <span className="lg:hidden text-xs text-gray-500 dark:text-gray-400">Kode: </span>
-                      <span className="font-mono text-sm font-medium text-gray-900 dark:text-white">
+                      <span className="lg:hidden text-xs text-slate-500">Kode: </span>
+                      <span className="font-mono text-sm font-medium text-slate-100">
                         {item.kode_pendaftaran || item.pendaftaran_id?.substring(0, 10)}
                       </span>
                     </div>
                     <div>
-                      <span className="lg:hidden text-xs text-gray-500 dark:text-gray-400">Jenis: </span>
-                      <span className="text-gray-700 dark:text-gray-300 font-medium">
+                      <span className="lg:hidden text-xs text-slate-500">Jenis: </span>
+                      <span className="text-slate-200 font-medium">
                         SIM {item.jenis_sim?.toUpperCase()}
                       </span>
                     </div>
                     <div>
-                      <span className="lg:hidden text-xs text-gray-500 dark:text-gray-400">Tanggal: </span>
-                      <span className="text-gray-500 dark:text-gray-400">
+                      <span className="lg:hidden text-xs text-slate-500">Tanggal: </span>
+                      <span className="text-slate-400">
                         {item.tanggal_ujian
                           ? new Date(item.tanggal_ujian).toLocaleDateString('id-ID', {
                             day: 'numeric',
@@ -248,15 +248,14 @@ export default function DashboardHome() {
                     </div>
                     <div>
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                        ${statusColors[item.status]?.bg || 'bg-gray-100'}
-                        ${statusColors[item.status]?.text || 'text-gray-700'}
-                        ${statusColors[item.status]?.dark || ''}
+                        ${statusColors[item.status]?.bg || 'bg-slate-700'}
+                        ${statusColors[item.status]?.text || 'text-slate-300'}
                       `}>
                         {statusLabels[item.status] || item.status}
                       </span>
                     </div>
                     <div>
-                      <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">Detail</button>
+                      <button className="text-sm text-blue-400 hover:text-blue-300 font-medium">Detail</button>
                     </div>
                   </div>
                 ))}

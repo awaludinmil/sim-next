@@ -2,12 +2,15 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-hover: #f1f5f9;
-  --border: #e2e8f0;
-  --muted: #64748b;
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --card-hover: #334155;
+  --border: #334155;
+  --muted: #94a3b8;
+  --card-bg: #1e293b;
+  --section-bg: #1e293b;
+  --input-bg: #334155;
 }
 
 @theme inline {
@@ -15,17 +18,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --card: #1e293b;
-    --card-hover: #334155;
-    --border: #334155;
-    --muted: #94a3b8;
-  }
 }
 
 * {

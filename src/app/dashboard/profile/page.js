@@ -200,32 +200,32 @@ export default function ProfilePage() {
                 <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-4xl font-bold text-white shadow-xl mb-4">
                   {phone ? phone.charAt(1).toUpperCase() : 'U'}
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Pengguna SIM Online</h2>
-                <p className="text-gray-500 text-sm">{phone || 'Nomor tidak tersedia'}</p>
+                <h2 className="text-xl font-bold text-slate-100">Pengguna SIM Online</h2>
+                <p className="text-slate-400 text-sm">{phone || 'Nomor tidak tersedia'}</p>
                 <span className={`inline-block mt-3 px-4 py-1.5 text-sm font-medium rounded-full ${
                   nikVerified
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-amber-100 text-amber-700'
+                    ? 'bg-emerald-500/20 text-emerald-400'
+                    : 'bg-amber-500/20 text-amber-400'
                 }`}>
                   {nikVerified ? '✓ NIK Terverifikasi' : '⚠ NIK Belum Verifikasi'}
                 </span>
               </div>
 
               <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <span className="text-gray-500">User ID</span>
-                  <span className="font-mono text-xs text-gray-900 truncate max-w-[150px]">
+                <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-xl">
+                  <span className="text-slate-400">User ID</span>
+                  <span className="font-mono text-xs text-slate-200 truncate max-w-[150px]">
                     {userId || '-'}
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <span className="text-gray-500">Status</span>
-                  <span className="text-emerald-600 font-medium">Aktif</span>
+                <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-xl">
+                  <span className="text-slate-400">Status</span>
+                  <span className="text-emerald-400 font-medium">Aktif</span>
                 </div>
                 {profile?.created_at && (
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                    <span className="text-gray-500">Bergabung</span>
-                    <span className="text-gray-900">
+                  <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-xl">
+                    <span className="text-slate-400">Bergabung</span>
+                    <span className="text-slate-200">
                       {new Date(profile.created_at).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}
                     </span>
                   </div>
@@ -234,7 +234,7 @@ export default function ProfilePage() {
 
               <button
                 onClick={handleLogout}
-                className="w-full mt-6 py-3 rounded-xl font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                className="w-full mt-6 py-3 rounded-xl font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 transition-colors"
               >
                 Keluar dari Akun
               </button>
@@ -245,8 +245,8 @@ export default function ProfilePage() {
             <div className="lg:hidden card p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">User ID</p>
-                  <p className="font-mono text-xs text-gray-900 truncate max-w-[200px]">
+                  <p className="text-sm text-slate-400">User ID</p>
+                  <p className="font-mono text-xs text-slate-200 truncate max-w-[200px]">
                     {userId || '-'}
                   </p>
                 </div>
@@ -255,7 +255,7 @@ export default function ProfilePage() {
                     navigator.clipboard.writeText(userId);
                     Swal.fire({ icon: 'success', title: 'Disalin!', timer: 1000, showConfirmButton: false });
                   }}
-                  className="text-blue-600 text-sm font-medium"
+                  className="text-blue-400 text-sm font-medium"
                 >
                   Salin
                 </button>
@@ -264,35 +264,35 @@ export default function ProfilePage() {
 
             {menuItems.map((section, sectionIndex) => (
               <section key={sectionIndex} className="card overflow-hidden">
-                <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
-                  <h3 className="font-semibold text-gray-900">{section.title}</h3>
+                <div className="px-6 py-4 bg-slate-700/50 border-b border-slate-600">
+                  <h3 className="font-semibold text-slate-100">{section.title}</h3>
                 </div>
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-slate-700">
                   {section.items.map((item, itemIndex) => (
                     <button
                       key={itemIndex}
                       onClick={item.action}
-                      className="w-full flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors text-left"
+                      className="w-full flex items-center gap-4 px-6 py-4 hover:bg-slate-700/50 transition-colors text-left"
                     >
-                      <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 bg-slate-700 rounded-xl flex items-center justify-center">
                         <span className="text-xl">{item.icon}</span>
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-medium text-gray-900">{item.label}</h4>
+                          <h4 className="font-medium text-slate-100">{item.label}</h4>
                           {item.badge && (
                             <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                               item.badge.color === 'emerald'
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : 'bg-amber-100 text-amber-700'
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : 'bg-amber-500/20 text-amber-400'
                             }`}>
                               {item.badge.text}
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500">{item.desc}</p>
+                        <p className="text-sm text-slate-400">{item.desc}</p>
                       </div>
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
@@ -304,45 +304,45 @@ export default function ProfilePage() {
             <div className="lg:hidden">
               <button
                 onClick={handleLogout}
-                className="w-full py-4 rounded-xl font-semibold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
+                className="w-full py-4 rounded-xl font-semibold text-red-400 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-colors"
               >
                 Keluar dari Akun
               </button>
             </div>
 
             <div className="text-center py-4">
-              <p className="text-sm text-gray-400">SIM Online v1.0.0</p>
-              <p className="text-xs text-gray-400">© 2024 Layanan Lalu Lintas</p>
+              <p className="text-sm text-slate-500">SIM Online v1.0.0</p>
+              <p className="text-xs text-slate-600">© 2024 Layanan Lalu Lintas</p>
             </div>
           </div>
         </div>
       </main>
 
       {showNikModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Verifikasi NIK</h3>
-            <p className="text-gray-600 text-sm mb-6">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <h3 className="text-xl font-bold text-slate-100 mb-2">Verifikasi NIK</h3>
+            <p className="text-slate-400 text-sm mb-6">
               Masukkan NIK (Nomor Induk Kependudukan) 16 digit Anda untuk verifikasi.
             </p>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">NIK</label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">NIK</label>
               <input
                 type="text"
                 value={nikInput}
                 onChange={(e) => setNikInput(e.target.value.replace(/\D/g, '').slice(0, 16))}
                 placeholder="3201010101010001"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 font-mono"
+                className="w-full px-4 py-3 bg-slate-700 border-2 border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 font-mono text-slate-100 placeholder-slate-500"
                 maxLength={16}
               />
-              <p className="mt-2 text-xs text-gray-500">{nikInput.length}/16 digit</p>
+              <p className="mt-2 text-xs text-slate-500">{nikInput.length}/16 digit</p>
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={() => setShowNikModal(false)}
-                className="flex-1 py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all"
+                className="flex-1 py-3 border-2 border-slate-600 text-slate-300 font-semibold rounded-xl hover:bg-slate-700 transition-all"
               >
                 Batal
               </button>
@@ -352,7 +352,7 @@ export default function ProfilePage() {
                 className={`flex-1 py-3 font-semibold rounded-xl transition-all ${
                   !verifyingNik && nikInput.length === 16
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 hover:shadow-xl'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                 }`}
               >
                 {verifyingNik ? 'Memverifikasi...' : 'Verifikasi'}

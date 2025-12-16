@@ -9,8 +9,8 @@ import api from '@/lib/api';
 const MapWithNoSSR = dynamic(() => import('./MapComponent'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[400px] bg-gray-100 rounded-xl flex items-center justify-center">
-      <div className="flex items-center gap-2 text-gray-500">
+    <div className="w-full h-[400px] bg-slate-700 rounded-xl flex items-center justify-center">
+      <div className="flex items-center gap-2 text-slate-400">
         <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -167,7 +167,7 @@ export default function NewSimPage() {
       <main className="px-5 lg:px-8 py-6 lg:py-8 max-w-7xl mx-auto">
         <div className="hidden lg:block mb-8">
           <div className="card p-6">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Langkah Pengajuan</h3>
+            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Langkah Pengajuan</h3>
             <div className="flex items-center justify-between">
               {steps.map((s, index) => (
                 <div key={s.number} className="flex items-center flex-1">
@@ -175,13 +175,13 @@ export default function NewSimPage() {
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                       ${s.status === 'completed' ? 'bg-emerald-500 text-white' :
                         s.status === 'current' ? 'bg-blue-600 text-white' :
-                          'bg-gray-200 text-gray-500'}`}>
+                          'bg-slate-700 text-slate-400'}`}>
                       {s.status === 'completed' ? '✓' : s.number}
                     </div>
-                    <span className={`font-medium ${s.status === 'current' ? 'text-blue-600' : 'text-gray-900'}`}>{s.title}</span>
+                    <span className={`font-medium ${s.status === 'current' ? 'text-blue-400' : 'text-slate-200'}`}>{s.title}</span>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`flex-1 h-0.5 mx-4 ${s.status === 'completed' ? 'bg-emerald-500' : 'bg-gray-200'}`} />
+                    <div className={`flex-1 h-0.5 mx-4 ${s.status === 'completed' ? 'bg-emerald-500' : 'bg-slate-700'}`} />
                   )}
                 </div>
               ))}
@@ -190,17 +190,17 @@ export default function NewSimPage() {
         </div>
 
         {!nikVerified && !loadingProfile && (
-          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
             <div className="flex items-start gap-3">
               <span className="text-2xl">⚠️</span>
               <div>
-                <h4 className="font-semibold text-amber-800">NIK Belum Terverifikasi</h4>
-                <p className="text-sm text-amber-700 mt-1">
+                <h4 className="font-semibold text-amber-400">NIK Belum Terverifikasi</h4>
+                <p className="text-sm text-amber-300/80 mt-1">
                   Anda harus memverifikasi NIK terlebih dahulu sebelum dapat mendaftar SIM.
                 </p>
                 <button
                   onClick={() => router.push('/dashboard/profile')}
-                  className="mt-2 text-sm font-medium text-amber-800 hover:underline"
+                  className="mt-2 text-sm font-medium text-amber-400 hover:underline"
                 >
                   Verifikasi NIK di Profil →
                 </button>
@@ -214,14 +214,14 @@ export default function NewSimPage() {
             {step === 1 && (
               <>
                 <section className="card p-6">
-                  <h2 className="font-bold text-lg text-gray-900 mb-4">Persyaratan Umum</h2>
+                  <h2 className="font-bold text-lg text-slate-100 mb-4">Persyaratan Umum</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {requirements.map((req, index) => (
-                      <div key={index} className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                      <div key={index} className="flex items-start gap-3 p-4 bg-blue-500/10 rounded-xl border border-blue-500/30">
                         <span className="text-2xl">{req.icon}</span>
                         <div>
-                          <h4 className="font-semibold text-gray-900">{req.title}</h4>
-                          <p className="text-sm text-gray-600">{req.desc}</p>
+                          <h4 className="font-semibold text-slate-100">{req.title}</h4>
+                          <p className="text-sm text-slate-400">{req.desc}</p>
                         </div>
                       </div>
                     ))}
@@ -229,7 +229,7 @@ export default function NewSimPage() {
                 </section>
 
                 <section className="card p-6">
-                  <h2 className="font-bold text-lg text-gray-900 mb-4">Pilih Jenis SIM</h2>
+                  <h2 className="font-bold text-lg text-slate-100 mb-4">Pilih Jenis SIM</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {simTypes.map((sim) => (
                       <div
@@ -237,10 +237,10 @@ export default function NewSimPage() {
                         onClick={() => setSelectedSimType(sim.type)}
                         className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-lg
                           ${selectedSimType === sim.type
-                            ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
+                            ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/30'
                             : sim.popular
-                              ? 'border-blue-300 bg-blue-50/50'
-                              : 'border-gray-200 hover:border-blue-300'}`}
+                              ? 'border-blue-400/50 bg-blue-500/5'
+                              : 'border-slate-600 hover:border-blue-400'}`}
                       >
                         {sim.popular && (
                           <span className="absolute -top-2 right-4 px-2 py-0.5 text-xs font-semibold bg-blue-600 text-white rounded-full">
@@ -251,10 +251,10 @@ export default function NewSimPage() {
                           <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold text-lg">
                             {sim.type.toUpperCase()}
                           </div>
-                          <span className="font-bold text-blue-600">{sim.price}</span>
+                          <span className="font-bold text-blue-400">{sim.price}</span>
                         </div>
-                        <h4 className="font-semibold text-gray-900">{sim.title}</h4>
-                        <p className="text-sm text-gray-500">{sim.desc}</p>
+                        <h4 className="font-semibold text-slate-100">{sim.title}</h4>
+                        <p className="text-sm text-slate-400">{sim.desc}</p>
                         {selectedSimType === sim.type && (
                           <div className="absolute top-2 left-2">
                             <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
@@ -273,12 +273,12 @@ export default function NewSimPage() {
 
             {step === 2 && (
               <section className="card p-6">
-                <h2 className="font-bold text-lg text-gray-900 mb-4">Pilih Lokasi Satpas</h2>
-                <p className="text-gray-600 mb-4">Klik marker pada peta untuk memilih lokasi Satpas terdekat Anda.</p>
+                <h2 className="font-bold text-lg text-slate-100 mb-4">Pilih Lokasi Satpas</h2>
+                <p className="text-slate-400 mb-4">Klik marker pada peta untuk memilih lokasi Satpas terdekat Anda.</p>
 
                 {loadingSatpas ? (
-                  <div className="w-full h-[400px] bg-gray-100 rounded-xl flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-gray-500">
+                  <div className="w-full h-[400px] bg-slate-700 rounded-xl flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-slate-400">
                       <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -287,8 +287,8 @@ export default function NewSimPage() {
                     </div>
                   </div>
                 ) : satpasList.length === 0 ? (
-                  <div className="w-full h-[400px] bg-gray-100 rounded-xl flex items-center justify-center">
-                    <p className="text-gray-500">Tidak ada data satpas tersedia</p>
+                  <div className="w-full h-[400px] bg-slate-700 rounded-xl flex items-center justify-center">
+                    <p className="text-slate-400">Tidak ada data satpas tersedia</p>
                   </div>
                 ) : (
                   <MapWithNoSSR
@@ -299,14 +299,14 @@ export default function NewSimPage() {
                 )}
 
                 {selectedSatpas && (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
                         <span className="text-2xl">📍</span>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">{selectedSatpas.name}</h4>
-                        <p className="text-sm text-gray-600">
+                        <h4 className="font-semibold text-slate-100">{selectedSatpas.name}</h4>
+                        <p className="text-sm text-slate-400">
                           {Number(selectedSatpas.latitude)?.toFixed(6)}, {Number(selectedSatpas.longitude)?.toFixed(6)}
                         </p>
                       </div>
@@ -318,29 +318,29 @@ export default function NewSimPage() {
 
             {step === 3 && (
               <section className="card p-6">
-                <h2 className="font-bold text-lg text-gray-900 mb-4">Pilih Tanggal Ujian</h2>
-                <p className="text-gray-600 mb-4">Pilih tanggal ujian minimal 7 hari dari sekarang.</p>
+                <h2 className="font-bold text-lg text-slate-100 mb-4">Pilih Tanggal Ujian</h2>
+                <p className="text-slate-400 mb-4">Pilih tanggal ujian minimal 7 hari dari sekarang.</p>
 
                 <div className="max-w-sm">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal Ujian</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Tanggal Ujian</label>
                   <input
                     type="date"
                     value={tanggalUjian}
                     onChange={(e) => setTanggalUjian(e.target.value)}
                     min={minDateStr}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    className="w-full px-4 py-3 bg-slate-700 border-2 border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 text-slate-100"
                   />
                 </div>
 
                 {tanggalUjian && (
-                  <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+                  <div className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center">
                         <span className="text-2xl">📅</span>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">Tanggal Terpilih</h4>
-                        <p className="text-sm text-gray-600">
+                        <h4 className="font-semibold text-slate-100">Tanggal Terpilih</h4>
+                        <p className="text-sm text-slate-400">
                           {new Date(tanggalUjian).toLocaleDateString('id-ID', {
                             weekday: 'long',
                             year: 'numeric',
@@ -357,22 +357,22 @@ export default function NewSimPage() {
 
             {step === 4 && (
               <section className="card p-6">
-                <h2 className="font-bold text-lg text-gray-900 mb-4">Konfirmasi Pendaftaran</h2>
+                <h2 className="font-bold text-lg text-slate-100 mb-4">Konfirmasi Pendaftaran</h2>
 
                 <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-xl">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">Jenis SIM</h4>
-                    <p className="font-semibold text-gray-900">SIM {selectedSimType?.toUpperCase()}</p>
+                  <div className="p-4 bg-slate-700/50 rounded-xl">
+                    <h4 className="text-sm font-medium text-slate-400 mb-1">Jenis SIM</h4>
+                    <p className="font-semibold text-slate-100">SIM {selectedSimType?.toUpperCase()}</p>
                   </div>
 
-                  <div className="p-4 bg-gray-50 rounded-xl">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">Lokasi Satpas</h4>
-                    <p className="font-semibold text-gray-900">{selectedSatpas?.name}</p>
+                  <div className="p-4 bg-slate-700/50 rounded-xl">
+                    <h4 className="text-sm font-medium text-slate-400 mb-1">Lokasi Satpas</h4>
+                    <p className="font-semibold text-slate-100">{selectedSatpas?.name}</p>
                   </div>
 
-                  <div className="p-4 bg-gray-50 rounded-xl">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">Tanggal Ujian</h4>
-                    <p className="font-semibold text-gray-900">
+                  <div className="p-4 bg-slate-700/50 rounded-xl">
+                    <h4 className="text-sm font-medium text-slate-400 mb-1">Tanggal Ujian</h4>
+                    <p className="font-semibold text-slate-100">
                       {tanggalUjian && new Date(tanggalUjian).toLocaleDateString('id-ID', {
                         weekday: 'long',
                         year: 'numeric',
@@ -388,25 +388,25 @@ export default function NewSimPage() {
 
           <div className="space-y-6">
             <div className="card p-6 sticky top-24">
-              <h3 className="font-bold text-lg text-gray-900 mb-4">Ringkasan</h3>
+              <h3 className="font-bold text-lg text-slate-100 mb-4">Ringkasan</h3>
 
               <div className="space-y-3 mb-6">
                 {selectedSimType && (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Jenis SIM</span>
-                    <span className="font-medium text-gray-900">SIM {selectedSimType.toUpperCase()}</span>
+                    <span className="text-slate-400">Jenis SIM</span>
+                    <span className="font-medium text-slate-100">SIM {selectedSimType.toUpperCase()}</span>
                   </div>
                 )}
                 {selectedSatpas && (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Satpas</span>
-                    <span className="font-medium text-gray-900 text-right max-w-[150px] truncate">{selectedSatpas.name}</span>
+                    <span className="text-slate-400">Satpas</span>
+                    <span className="font-medium text-slate-100 text-right max-w-[150px] truncate">{selectedSatpas.name}</span>
                   </div>
                 )}
                 {tanggalUjian && (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Tanggal</span>
-                    <span className="font-medium text-gray-900">{new Date(tanggalUjian).toLocaleDateString('id-ID')}</span>
+                    <span className="text-slate-400">Tanggal</span>
+                    <span className="font-medium text-slate-100">{new Date(tanggalUjian).toLocaleDateString('id-ID')}</span>
                   </div>
                 )}
               </div>
@@ -415,7 +415,7 @@ export default function NewSimPage() {
                 {step > 1 && (
                   <button
                     onClick={() => setStep(step - 1)}
-                    className="flex-1 py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all"
+                    className="flex-1 py-3 border-2 border-slate-600 text-slate-300 font-semibold rounded-xl hover:bg-slate-700 transition-all"
                   >
                     Kembali
                   </button>

@@ -4,13 +4,19 @@ const TOKEN_KEYS = {
   CSRF: 'csrfToken',
 };
 
-const getStoredTokens = () => ({
-  accessToken: localStorage.getItem(TOKEN_KEYS.ACCESS),
-  refreshToken: localStorage.getItem(TOKEN_KEYS.REFRESH),
-  csrfToken: localStorage.getItem(TOKEN_KEYS.CSRF),
-});
+const getStoredTokens = () => {
+  if (typeof window === 'undefined') {
+    return { accessToken: null, refreshToken: null, csrfToken: null };
+  }
+  return {
+    accessToken: localStorage.getItem(TOKEN_KEYS.ACCESS),
+    refreshToken: localStorage.getItem(TOKEN_KEYS.REFRESH),
+    csrfToken: localStorage.getItem(TOKEN_KEYS.CSRF),
+  };
+};
 
 const setStoredTokens = (tokens) => {
+  if (typeof window === 'undefined') return;
   if (tokens.access_token) {
     localStorage.setItem(TOKEN_KEYS.ACCESS, tokens.access_token);
   }
@@ -23,6 +29,7 @@ const setStoredTokens = (tokens) => {
 };
 
 const clearStoredTokens = () => {
+  if (typeof window === 'undefined') return;
   localStorage.removeItem(TOKEN_KEYS.ACCESS);
   localStorage.removeItem(TOKEN_KEYS.REFRESH);
   localStorage.removeItem(TOKEN_KEYS.CSRF);
@@ -32,6 +39,7 @@ const clearStoredTokens = () => {
 
 let isRefreshing = false;
 let refreshSubscribers = [];
+let refreshAttempted = false;
 
 const onRefreshed = (newAccessToken) => {
   refreshSubscribers.forEach((callback) => callback(newAccessToken));
@@ -44,9 +52,14 @@ const addRefreshSubscriber = (callback) => {
 
 const refreshAccessToken = async () => {
   try {
+    const { refreshToken } = getStoredTokens();
+    
     const response = await fetch('/api/auth/users/refresh', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refresh_token: refreshToken }),
       credentials: 'include',
     });
 
@@ -58,10 +71,10 @@ const refreshAccessToken = async () => {
     
     if (result.success && result.data?.tokens) {
       setStoredTokens(result.data.tokens);
+      refreshAttempted = false;
       return result.data.tokens.access_token;
     }
     
-    // Handle CSRF token from root level
     if (result.success && result.csrf_token) {
       localStorage.setItem(TOKEN_KEYS.CSRF, result.csrf_token);
     }
@@ -69,9 +82,6 @@ const refreshAccessToken = async () => {
     throw new Error('Invalid refresh response');
   } catch (error) {
     clearStoredTokens();
-    if (typeof window !== 'undefined') {
-      window.location.href = '/auth/phone-verification';
-    }
     throw error;
   }
 };
@@ -79,6 +89,7 @@ const refreshAccessToken = async () => {
 const apiClient = async (url, options = {}) => {
   const { accessToken, csrfToken } = getStoredTokens();
   const method = (options.method || 'GET').toUpperCase();
+  const skipAutoRefresh = options.skipAutoRefresh || false;
   
   const headers = {
     'Content-Type': 'application/json',
@@ -98,10 +109,14 @@ const apiClient = async (url, options = {}) => {
     headers,
     credentials: 'include',
   };
+  
+  delete fetchOptions.skipAutoRefresh;
 
   let response = await fetch(url, fetchOptions);
 
-  if (response.status === 401) {
+  if (response.status === 401 && !skipAutoRefresh && !refreshAttempted) {
+    refreshAttempted = true;
+    
     if (!isRefreshing) {
       isRefreshing = true;
       
@@ -111,7 +126,8 @@ const apiClient = async (url, options = {}) => {
         onRefreshed(newAccessToken);
       } catch (error) {
         isRefreshing = false;
-        throw error;
+        refreshAttempted = false;
+        return response;
       }
     }
 
@@ -134,8 +150,10 @@ const apiClient = async (url, options = {}) => {
             headers: retryHeaders,
           });
           
+          refreshAttempted = false;
           resolve(retryResponse);
         } catch (error) {
+          refreshAttempted = false;
           reject(error);
         }
       });
@@ -143,6 +161,12 @@ const apiClient = async (url, options = {}) => {
   }
 
   return response;
+};
+
+const resetRefreshState = () => {
+  refreshAttempted = false;
+  isRefreshing = false;
+  refreshSubscribers = [];
 };
 
 const api = {
@@ -175,7 +199,9 @@ const api = {
   setTokens: setStoredTokens,
   getTokens: getStoredTokens,
   clearTokens: clearStoredTokens,
+  resetRefreshState,
 };
 
 export default api;
-export { setStoredTokens, getStoredTokens, clearStoredTokens };
+export { setStoredTokens, getStoredTokens, clearStoredTokens, resetRefreshState };
+

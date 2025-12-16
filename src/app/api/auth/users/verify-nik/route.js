@@ -7,11 +7,13 @@ export async function PUT(request) {
     const body = await request.json();
     const accessToken = request.headers.get('authorization')?.replace('Bearer ', '');
     const csrfToken = request.headers.get('x-csrf-token');
+    const cookies = request.headers.get('cookie') || '';
 
     const response = await fetch(`${BASE_URL}/api/auth/users/verify-nik`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Cookie': cookies,
         ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
         ...(csrfToken && { 'X-CSRF-Token': csrfToken }),
       },

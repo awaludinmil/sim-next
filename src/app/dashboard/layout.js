@@ -60,7 +60,7 @@ function SidebarNavItem({ href, label, icon, active, collapsed }) {
       className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
         ${active 
           ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30' 
-          : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+          : 'text-slate-300 hover:bg-slate-800'
         }
         ${collapsed ? 'justify-center' : ''}
       `}
@@ -83,8 +83,8 @@ function BottomNavItem({ href, label, icon, active }) {
       href={href}
       className={`flex flex-col items-center justify-center gap-1 py-2 px-3 rounded-xl transition-all duration-300
         ${active 
-          ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30' 
-          : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+          ? 'text-blue-400 bg-blue-500/20' 
+          : 'text-slate-400 hover:text-slate-200'
         }
       `}
     >
@@ -143,23 +143,23 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
       {/* Desktop Sidebar */}
       <aside 
-        className={`fixed left-0 top-0 h-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/50 z-40 transition-all duration-300 hidden lg:flex flex-col
+        className={`fixed left-0 top-0 h-full bg-slate-900/80 backdrop-blur-xl border-r border-slate-700/50 z-40 transition-all duration-300 hidden lg:flex flex-col
           ${sidebarCollapsed ? 'w-20' : 'w-72'}
         `}
       >
         {/* Logo Header */}
-        <div className={`p-6 border-b border-gray-200/50 dark:border-gray-700/50 ${sidebarCollapsed ? 'px-4' : ''}`}>
+        <div className={`p-6 border-b border-slate-700/50 ${sidebarCollapsed ? 'px-4' : ''}`}>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 flex-shrink-0">
               <span className="text-white text-xl">🛡️</span>
             </div>
             {!sidebarCollapsed && (
               <div className="overflow-hidden">
-                <h1 className="font-bold text-gray-900 dark:text-white text-lg leading-tight">SIM Online</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Lalu Lintas</p>
+                <h1 className="font-bold text-white text-lg leading-tight">SIM Online</h1>
+                <p className="text-xs text-slate-400">Lalu Lintas</p>
               </div>
             )}
           </div>
@@ -183,10 +183,10 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         {/* Collapse Toggle */}
-        <div className="p-4 border-t border-gray-200/50 dark:border-gray-700/50">
+        <div className="p-4 border-t border-slate-700/50">
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all duration-300"
           >
             <svg
               className={`w-5 h-5 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`}
@@ -208,17 +208,17 @@ export default function DashboardLayout({ children }) {
         `}
       >
         {/* Top Header for Desktop */}
-        <header className="hidden lg:flex items-center justify-between px-8 py-6 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-30">
+        <header className="hidden lg:flex items-center justify-between px-8 py-6 bg-slate-900/50 backdrop-blur-sm border-b border-slate-700/50 sticky top-0 z-30">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-white">
               {navigationItems.find(item => isActive(item.href))?.label || 'Dashboard'}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Sistem Informasi Manajemen SIM</p>
+            <p className="text-sm text-slate-400 mt-1">Sistem Informasi Manajemen SIM</p>
           </div>
           
           {/* User Info */}
           <div className="flex items-center gap-4">
-            <button className="p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+            <button className="p-3 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
@@ -236,7 +236,7 @@ export default function DashboardLayout({ children }) {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-700/50 z-50 safe-area-inset-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-xl border-t border-slate-700/50 z-50 safe-area-inset-bottom">
         <div className="flex items-center justify-around px-2 py-2">
           {navigationItems.map((item) => (
             <BottomNavItem

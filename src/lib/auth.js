@@ -27,7 +27,9 @@ export const useAuth = (redirectTo = '/auth/phone-verification') => {
       const response = await api.get('/api/auth/users/me');
       
       if (response.status === 401) {
+        // Clear tokens and redirect - the auto-refresh already failed
         api.clearTokens();
+        setIsLoading(false);
         router.replace(redirectTo);
         return;
       }
@@ -37,12 +39,17 @@ export const useAuth = (redirectTo = '/auth/phone-verification') => {
       if (data.success && data.data) {
         setUser(data.data);
         setIsAuthenticated(true);
+        // Save CSRF token if returned
+        if (data.csrf_token) {
+          localStorage.setItem('csrfToken', data.csrf_token);
+        }
       } else {
         api.clearTokens();
         router.replace(redirectTo);
       }
     } catch (error) {
       console.error('Auth check error:', error);
+      // Only clear and redirect if it's an auth error
       api.clearTokens();
       router.replace(redirectTo);
     } finally {
@@ -57,6 +64,7 @@ export const useAuth = (redirectTo = '/auth/phone-verification') => {
       console.error('Logout error:', error);
     } finally {
       api.clearTokens();
+      api.resetRefreshState();
       localStorage.removeItem('currentUserId');
       localStorage.removeItem('currentPhone');
       localStorage.removeItem('currentOTP');

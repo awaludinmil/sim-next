@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -10,22 +10,32 @@ export default function PhoneVerificationPage() {
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const sessionChecked = useRef(false);
 
   useEffect(() => {
+    if (sessionChecked.current) return;
+    sessionChecked.current = true;
     checkActiveSession();
   }, []);
 
   const checkActiveSession = async () => {
     try {
+      // Check if there's an access token first
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.log('No access token, skipping session check');
+        return;
+      }
+
       // Import api dynamically
       const api = (await import('@/lib/api')).default;
-      const response = await api.get('/api/auth/users/me');
+      // Use skipAutoRefresh to prevent infinite loop when session is expired
+      const response = await api.get('/api/auth/users/me', { skipAutoRefresh: true });
 
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
           // If session is valid, redirect to dashboard
-          // But show a small toast or just redirect
           const Swal = (await import('sweetalert2')).default;
 
           Swal.fire({
