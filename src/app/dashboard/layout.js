@@ -43,6 +43,15 @@ const navigationItems = [
     ),
   },
   {
+    href: '/dashboard/riwayat-transaksi',
+    label: 'Riwayat Transaksi',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6">
+        <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+  },
+  {
     href: '/dashboard/profile',
     label: 'Profil',
     icon: (
@@ -58,8 +67,8 @@ function SidebarNavItem({ href, label, icon, active, collapsed }) {
     <Link
       href={href}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
-        ${active 
-          ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30' 
+        ${active
+          ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
           : 'text-slate-300 hover:bg-slate-800'
         }
         ${collapsed ? 'justify-center' : ''}
@@ -82,8 +91,8 @@ function BottomNavItem({ href, label, icon, active }) {
     <Link
       href={href}
       className={`flex flex-col items-center justify-center gap-1 py-2 px-3 rounded-xl transition-all duration-300
-        ${active 
-          ? 'text-blue-400 bg-blue-500/20' 
+        ${active
+          ? 'text-blue-400 bg-blue-500/20'
           : 'text-slate-400 hover:text-slate-200'
         }
       `}
@@ -123,7 +132,7 @@ export default function DashboardLayout({ children }) {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -145,7 +154,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
       {/* Desktop Sidebar */}
-      <aside 
+      <aside
         className={`fixed left-0 top-0 h-full bg-slate-900/80 backdrop-blur-xl border-r border-slate-700/50 z-40 transition-all duration-300 hidden lg:flex flex-col
           ${sidebarCollapsed ? 'w-20' : 'w-72'}
         `}
@@ -202,7 +211,7 @@ export default function DashboardLayout({ children }) {
       </aside>
 
       {/* Main Content */}
-      <main 
+      <main
         className={`min-h-screen transition-all duration-300 pb-20 lg:pb-0
           ${sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'}
         `}
@@ -215,7 +224,7 @@ export default function DashboardLayout({ children }) {
             </h2>
             <p className="text-sm text-slate-400 mt-1">Sistem Informasi Manajemen SIM</p>
           </div>
-          
+
           {/* User Info */}
           <div className="flex items-center gap-4">
             <button className="p-3 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
