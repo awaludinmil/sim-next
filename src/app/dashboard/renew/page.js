@@ -46,14 +46,14 @@ export default function RenewSimPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Info Banner */}
-            <div className="card p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200">
+            <div className="card p-6 bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border-emerald-700/50">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-emerald-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                   <span className="text-2xl">💡</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Informasi Perpanjangan</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="font-semibold text-white mb-1">Informasi Perpanjangan</h3>
+                  <p className="text-sm text-slate-300">
                     Perpanjangan SIM dapat dilakukan maksimal 1 tahun sebelum masa berlaku habis. 
                     Pastikan dokumen Anda masih berlaku.
                   </p>
@@ -63,15 +63,15 @@ export default function RenewSimPage() {
 
             {/* My SIM Cards */}
             <section className="card p-6">
-              <h2 className="font-bold text-lg text-gray-900 mb-4">SIM Saya</h2>
+              <h2 className="font-bold text-lg text-white mb-4">SIM Saya</h2>
               <div className="space-y-4">
                 {simData.map((sim, index) => (
                   <div 
                     key={index}
                     className={`relative p-5 rounded-xl border-2 cursor-pointer transition-all hover:shadow-lg
                       ${sim.status === 'expiring' 
-                        ? 'border-amber-300 bg-amber-50/50' 
-                        : 'border-gray-200 hover:border-emerald-300'}`}
+                        ? 'border-amber-500/50 bg-amber-900/20' 
+                        : 'border-slate-600 hover:border-emerald-500/50 bg-slate-800/50'}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-4">
@@ -79,10 +79,10 @@ export default function RenewSimPage() {
                           {sim.type}
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900">SIM {sim.type}</h4>
-                          <p className="text-sm text-gray-500 font-mono">{sim.number}</p>
-                          <p className="text-sm text-gray-500 mt-1">
-                            Berlaku hingga: <span className="font-medium">{sim.expiry}</span>
+                          <h4 className="font-semibold text-white">SIM {sim.type}</h4>
+                          <p className="text-sm text-slate-400 font-mono">{sim.number}</p>
+                          <p className="text-sm text-slate-400 mt-1">
+                            Berlaku hingga: <span className="font-medium text-slate-300">{sim.expiry}</span>
                           </p>
                         </div>
                       </div>
@@ -104,18 +104,18 @@ export default function RenewSimPage() {
 
             {/* Steps */}
             <section className="card p-6">
-              <h2 className="font-bold text-lg text-gray-900 mb-4">Langkah Perpanjangan</h2>
+              <h2 className="font-bold text-lg text-white mb-4">Langkah Perpanjangan</h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {steps.map((step, index) => (
                   <div key={index} className="text-center p-4">
-                    <div className="w-14 h-14 mx-auto bg-emerald-100 rounded-2xl flex items-center justify-center mb-3">
+                    <div className="w-14 h-14 mx-auto bg-emerald-900/50 rounded-2xl flex items-center justify-center mb-3">
                       <span className="text-2xl">{step.icon}</span>
                     </div>
                     <div className="w-8 h-8 mx-auto -mt-6 mb-2 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
                       {index + 1}
                     </div>
-                    <h4 className="font-semibold text-gray-900 text-sm">{step.title}</h4>
-                    <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
+                    <h4 className="font-semibold text-white text-sm">{step.title}</h4>
+                    <p className="text-xs text-slate-400 mt-1">{step.desc}</p>
                   </div>
                 ))}
               </div>
@@ -126,16 +126,16 @@ export default function RenewSimPage() {
           <div className="space-y-6">
             {/* Requirements */}
             <div className="card p-6">
-              <h3 className="font-bold text-lg text-gray-900 mb-4">Dokumen Diperlukan</h3>
+              <h3 className="font-bold text-lg text-white mb-4">Dokumen Diperlukan</h3>
               <ul className="space-y-3">
                 {[
                   { icon: '🪪', text: 'KTP yang masih berlaku' },
                   { icon: '💳', text: 'SIM lama' },
                   { icon: '📸', text: 'Pas foto 4x6 (opsional)' },
                 ].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                  <li key={index} className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-xl">
                     <span className="text-xl">{item.icon}</span>
-                    <span className="text-sm text-gray-700">{item.text}</span>
+                    <span className="text-sm text-slate-200">{item.text}</span>
                   </li>
                 ))}
               </ul>
@@ -143,19 +143,19 @@ export default function RenewSimPage() {
 
             {/* Pricing */}
             <div className="card p-6 sticky top-24">
-              <h3 className="font-bold text-lg text-gray-900 mb-4">Biaya Perpanjangan</h3>
+              <h3 className="font-bold text-lg text-white mb-4">Biaya Perpanjangan</h3>
               <div className="space-y-3 mb-6">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Biaya SIM C</span>
-                  <span className="font-medium text-gray-900">Rp 75.000</span>
+                  <span className="text-slate-400">Biaya SIM C</span>
+                  <span className="font-medium text-slate-200">Rp 75.000</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Biaya SIM A/B1</span>
-                  <span className="font-medium text-gray-900">Rp 80.000</span>
+                  <span className="text-slate-400">Biaya SIM A/B1</span>
+                  <span className="font-medium text-slate-200">Rp 80.000</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Biaya Admin</span>
-                  <span className="font-medium text-gray-900">Rp 30.000</span>
+                  <span className="text-slate-400">Biaya Admin</span>
+                  <span className="font-medium text-slate-200">Rp 30.000</span>
                 </div>
               </div>
               <button className="w-full py-4 rounded-xl font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all">
