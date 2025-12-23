@@ -129,10 +129,15 @@ export default function NewSimPage() {
         });
         router.push('/dashboard');
       } else {
+        const err =
+          typeof data?.errors === 'string' ? data.errors
+          : Array.isArray(data?.errors) ? data.errors.join(', ')
+          : (data?.errors && typeof data.errors === 'object') ? Object.values(data.errors).flat().join(', ')
+          : data?.message || 'Gagal melakukan pendaftaran';
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: data.message || 'Gagal melakukan pendaftaran',
+          text: err,
           confirmButtonColor: '#3B82F6',
         });
       }
@@ -141,7 +146,7 @@ export default function NewSimPage() {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Terjadi kesalahan saat mengirim pendaftaran',
+        text: error?.message || 'Terjadi kesalahan saat mengirim pendaftaran',
         confirmButtonColor: '#3B82F6',
       });
     } finally {
